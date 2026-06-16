@@ -15,6 +15,7 @@ const sortSelectEl = document.getElementById('sort-select');
 const filterBadgesEl = document.getElementById('filter-badges');
 const refreshBtnEl = document.getElementById('refresh-btn');
 const exportCsvBtnEl = document.getElementById('export-csv-btn');
+const themeToggleBtnEl = document.getElementById('theme-toggle');
 const resultsCountEl = document.getElementById('results-count');
 
 // Metrics DOM Elements
@@ -63,6 +64,33 @@ document.addEventListener('DOMContentLoaded', () => {
   tweetTextareaEl.addEventListener('input', updateCharCount);
   copyTweetBtnEl.addEventListener('click', copyTweetToClipboard);
   sendTweetBtnEl.addEventListener('click', openTwitterIntent);
+
+  // Theme Toggle Logic
+  const sunIcon = themeToggleBtnEl.querySelector('.sun-icon');
+  const moonIcon = themeToggleBtnEl.querySelector('.moon-icon');
+
+  // Check saved theme
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+    sunIcon.style.display = 'none';
+    moonIcon.style.display = 'inline-block';
+  }
+
+  themeToggleBtnEl.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light-theme');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    
+    if (isLight) {
+      sunIcon.style.display = 'none';
+      moonIcon.style.display = 'inline-block';
+      showToast('Modo claro activado');
+    } else {
+      sunIcon.style.display = 'inline-block';
+      moonIcon.style.display = 'none';
+      showToast('Modo oscuro activado');
+    }
+  });
 });
 
 // ==========================================================================
