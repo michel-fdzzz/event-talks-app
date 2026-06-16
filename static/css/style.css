@@ -491,6 +491,26 @@ header {
   background: rgba(13, 22, 48, 0.8);
 }
 
+/* Keyboard Focus States (Accessibility) */
+.release-card:focus {
+  outline: none;
+}
+
+.release-card:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 4px;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+  background: var(--bg-glass-hover);
+}
+
+.btn:focus-visible,
+.filter-badge:focus-visible,
+.select-input:focus-visible,
+.search-input:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
 /* Left Indicator Colors */
 .release-card[data-type="Feature"]::before { background: var(--color-feature); }
 .release-card[data-type="Change"]::before { background: var(--color-change); }

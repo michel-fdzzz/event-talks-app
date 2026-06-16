@@ -287,10 +287,25 @@ function renderFeed() {
       </div>
     `;
     
-    // Add click listener to select a card visually
-    card.addEventListener('click', () => {
+    // Accessibility properties
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `Nota del ${release.date}, tipo ${release.type}`);
+    
+    const selectCard = () => {
       document.querySelectorAll('.release-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
+    };
+    
+    // Add click listener to select a card visually
+    card.addEventListener('click', selectCard);
+    
+    // Keydown listener for Enter and Space (Accessibility)
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectCard();
+      }
     });
     
     releaseListEl.appendChild(card);
