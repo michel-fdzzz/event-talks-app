@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // API Interaction
 // ==========================================================================
 async function initApp() {
+  readURLParams();
   await fetchReleases(false);
 }
 
@@ -211,6 +212,9 @@ function applyFiltersAndRender() {
   
   // Update UI results count
   resultsCountEl.textContent = `${filteredReleases.length} actualización${filteredReleases.length !== 1 ? 'es' : ''}`;
+  
+  // Update URL Search Parameters
+  updateURLParams();
   
   // Render
   renderFeed();
@@ -481,4 +485,41 @@ function exportToCSV() {
   document.body.removeChild(link);
   
   showToast('¡CSV exportado con éxito!');
+}
+
+// ==========================================================================
+// URL Parameters Sync Logic (UX state sharing)
+// ==========================================================================
+function readURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  
+  // 1. Search Query
+  searchQuery = params.get('search') || '';
+  searchInputEl.value = searchQuery;
+  
+  // 2. Type Filter
+  currentFilter = params.get('type') || 'all';
+  // Update active state of badges
+  document.querySelectorAll('.filter-badge').forEach(badge => {
+    if (badge.getAttribute('data-type').toLowerCase() === currentFilter.toLowerCase()) {
+      badge.classList.add('active');
+    } else {
+      badge.classList.remove('active');
+    }
+  });
+  
+  // 3. Sort
+  currentSort = params.get('sort') || 'newest';
+  sortSelectEl.value = currentSort;
+}
+
+function updateURLParams() {
+  const params = new URLSearchParams();
+  if (searchQuery) params.set('search', searchQuery);
+  if (currentFilter && currentFilter !== 'all') params.set('type', currentFilter);
+  if (currentSort && currentSort !== 'newest') params.set('sort', currentSort);
+  
+  const queryStr = params.toString();
+  const newRelativePathQuery = window.location.pathname + (queryStr ? '?' + queryStr : '');
+  window.history.replaceState(null, '', newRelativePathQuery);
 }
