@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigQuery Release Pulse - Notas de Lanzamiento en Tiempo Real</title>
+  <meta name="description" content="Visualiza, filtra y comparte las últimas actualizaciones y notas de lanzamiento de Google Cloud BigQuery.">
+  
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- Header Component -->
+  <header>
+    <div class="container header-container">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <!-- Cube/Data node SVG Icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="logo-title">
+          <h1>BigQuery Release Pulse</h1>
+          <p>Feeds oficiales de actualizaciones de Google Cloud</p>
+        </div>
+      </div>
+      
+      <div class="action-section">
+        <button id="refresh-btn" class="btn btn-primary">
+          <div class="spinner" id="refresh-spinner"></div>
+          <svg id="refresh-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;">
+            <path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+          <span>Actualizar</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <!-- Metrics Dashboard Row -->
+    <section class="metrics-grid" aria-label="Estadísticas de Actualizaciones">
+      <div class="metric-card">
+        <div class="metric-icon total">📦</div>
+        <div class="metric-info">
+          <h3 id="metric-total-count">-</h3>
+          <p>Total Notas</p>
+        </div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-icon features">⚡</div>
+        <div class="metric-info">
+          <h3 id="metric-features-count">-</h3>
+          <p>Features (Nuevos)</p>
+        </div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-icon changes">🔄</div>
+        <div class="metric-info">
+          <h3 id="metric-changes-count">-</h3>
+          <p>Cambios</p>
+        </div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-icon issues">⚠️</div>
+        <div class="metric-info">
+          <h3 id="metric-issues-count">-</h3>
+          <p>Problemas / Deprecaciones</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters & Search Section -->
+    <section class="filter-panel" aria-label="Búsqueda y Filtros">
+      <div class="search-row">
+        <div class="search-wrapper">
+          <svg viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+          <input type="text" id="search-input" class="search-input" placeholder="Buscar por palabra clave, fecha, tipo..." aria-label="Buscar actualizaciones">
+        </div>
+        
+        <div class="sort-wrapper">
+          <label for="sort-select">Ordenar por:</label>
+          <select id="sort-select" class="select-input">
+            <option value="newest">Más recientes primero</option>
+            <option value="oldest">Más antiguos primero</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="badges-row" id="filter-badges">
+        <span class="label">Tipo:</span>
+        <button class="filter-badge active" data-type="all">Todos</button>
+        <button class="filter-badge" data-type="Feature">Features</button>
+        <button class="filter-badge" data-type="Change">Cambios</button>
+        <button class="filter-badge" data-type="Issue">Problemas</button>
+        <button class="filter-badge" data-type="Deprecation">Deprecaciones</button>
+      </div>
+    </section>
+
+    <!-- Release Notes Feed -->
+    <section aria-label="Notas de lanzamiento">
+      <div class="feed-header">
+        <h2>Listado de Actualizaciones</h2>
+        <span class="results-count" id="results-count">Cargando actualizaciones...</span>
+      </div>
+      
+      <div class="release-list" id="release-list">
+        <!-- Skeleton Loaders rendered dynamically by JS during loading -->
+        <div class="release-card skeleton-card"></div>
+        <div class="release-card skeleton-card"></div>
+        <div class="release-card skeleton-card"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Share on Twitter Modal -->
+  <div class="modal-overlay" id="tweet-modal" aria-hidden="true" role="dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>
+          <!-- Twitter SVG logo -->
+          <svg viewBox="0 0 24 24">
+            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+          </svg>
+          Compartir en Twitter / X
+        </h3>
+        <button class="close-modal-btn" id="close-modal-btn" aria-label="Cerrar modal">&times;</button>
+      </div>
+      
+      <div class="tweet-textarea-wrapper">
+        <textarea id="tweet-textarea" class="tweet-textarea" placeholder="¿Qué está pasando?" maxlength="350"></textarea>
+      </div>
+      
+      <div class="tweet-meta-info">
+        <span>Edita tu borrador antes de enviar</span>
+        <span class="character-count" id="char-count">0/280</span>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="copy-tweet-btn">
+          <span>Copiar Texto</span>
+        </button>
+        <button class="btn btn-primary" id="send-tweet-btn">
+          <span>Tuitear</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast" role="alert">
+    <!-- Success Checkmark SVG -->
+    <svg viewBox="0 0 24 24">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+    </svg>
+    <span class="toast-text">Success!</span>
+  </div>
+
+  <!-- JS Scripts -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
